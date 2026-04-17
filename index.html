@@ -91,7 +91,7 @@
         <input type="text" id="player-name" placeholder="Minecraft Username" oninput="changeHead()">
         
         <div style="background:rgba(59, 130, 246, 0.1); padding:15px; border-radius:12px; margin-bottom:15px;">
-            <p id="math-prompt" style="color:#60a5fa; font-weight:bold;"></p>
+            <p id="math-prompt" style="color:#60a5fa; font-weight:bold;">Loading math...</p>
             <input type="number" id="math-user-answer" placeholder="Result?" style="width:100px; margin-top:10px; margin-bottom:0;">
         </div>
         
@@ -135,7 +135,8 @@
 
     <script>
         let secretAnswer;
-        const gamesList = ["Survival", "OneBlock", "BedWars", "The Bridge", "Lifesteal" , "murdermystery", "shut up" "];
+        // تم تصليح الخطأ هنا (حذف علامة التنصيص الزائدة)
+        const gamesList = ["Survival", "OneBlock", "BedWars", "The Bridge", "Lifesteal" , "murdermystery", "Skyblock"];
 
         // 1. Math System
         function newMath() {
@@ -160,7 +161,6 @@
             const u = document.getElementById('player-name').value.trim();
             const a = document.getElementById('math-user-answer').value;
             if(u && parseInt(a) === secretAnswer) {
-                // حفظ في ذاكرة المتصفح
                 localStorage.setItem('hk_username', u);
                 showPortal(u);
             } else {
@@ -170,7 +170,6 @@
             }
         }
 
-        // وظيفة إظهار الـ Portal
         function showPortal(username) {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('portal-screen').style.display = 'flex';
@@ -178,23 +177,20 @@
             changeHead(username);
         }
 
-        // 4. Persistence (الفحص عند فتح الصفحة)
         function checkPersistentLogin() {
             const savedUser = localStorage.getItem('hk_username');
             if(savedUser) {
                 showPortal(savedUser);
             } else {
-                newMath(); // لو مش مسجل نولد مسألة جديدة
+                newMath(); 
             }
         }
 
-        // 5. Logout
         function logout() {
             localStorage.removeItem('hk_username');
-            location.reload(); // إعادة تحميل الصفحة للرجوع لشاشة الدخول
+            location.reload();
         }
 
-        // 6. Server Check (API)
         async function refreshServer() {
             try {
                 const response = await fetch('https://api.mcsrvstat.us/2/hyperkingdom.mcsh.io');
@@ -225,7 +221,6 @@
             } catch(e) { console.error("API Error"); }
         }
 
-        // UI
         function togglePlayerList() {
             const box = document.getElementById('player-list-box');
             box.style.display = box.style.display === 'block' ? 'none' : 'block';
@@ -253,7 +248,7 @@
         }
 
         // التشغيل الابتدائي
-        checkPersistentLogin(); // أول حاجة نشوف لو فيه يوزر متسجل
+        checkPersistentLogin(); 
         refreshServer();
         setInterval(refreshServer, 20000);
     </script>
