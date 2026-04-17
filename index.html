@@ -80,22 +80,19 @@
         // حالة السيرفر وقائمة اللاعبين
 async function checkServerStatus() {
     try {
-        // استخدام API مختلف وأسرع في التحديث اللحظي
-        // إضافة رقم عشوائي (Math.random) لكسر الكاش تماماً في كل ثانية
-        const res = await fetch(`https://api.minetools.eu/ping/${serverIP.replace(':', '/')}`);
+        // نستخدم mcapi.us لأنه أسرع وأكثر استقراراً لسيرفرات الكراك
+        const res = await fetch(`https://mcapi.us/server/status?ip=${serverIP}`);
         const data = await res.json();
         
         const dot = document.getElementById('status-dot');
         const text = document.getElementById('is-online');
         const wrapper = document.getElementById('players-wrapper');
         
-        if(!data.error) {
+        if(data.status === "success" && data.online) {
             dot.style.background = "#10b981";
-            // عدد اللاعبين من الداتا اللحظية
-            const onlineCount = data.players.online;
-            text.innerText = `YES (${onlineCount})`;
+            text.innerText = `YES (${data.players.now})`;
             
-            // جلب الأسامي من عينة اللاعبين (Sample)
+            // تحديث القائمة فقط لو فيه بيانات جديدة، عشان ميبقاش فيه "رعشة" في الشاشة
             if (data.players.sample && data.players.sample.length > 0) {
                 wrapper.innerHTML = data.players.sample.map(p => `
                     <div class="player-item">
@@ -103,10 +100,10 @@ async function checkServerStatus() {
                         <span>${p.name}</span>
                     </div>
                 `).join('');
-            } else if (onlineCount > 0) {
-                wrapper.innerHTML = `<p style="font-size:0.7rem; color:#60a5fa; text-align:center;">${onlineCount} Players detected...</p>`;
+            } else if (data.players.now > 0) {
+                wrapper.innerHTML = `<p style="font-size:0.75rem; color:#60a5fa; text-align:center; padding:10px;">${data.players.now} Players Active</p>`;
             } else {
-                wrapper.innerHTML = `<p style="font-size:0.8rem; color:#666; text-align:center;">No one is online</p>`;
+                wrapper.innerHTML = `<p style="font-size:0.8rem; color:#666; text-align:center; padding:10px;">No Players Online</p>`;
             }
         } else {
             dot.style.background = "#ef4444";
@@ -114,16 +111,13 @@ async function checkServerStatus() {
             wrapper.innerHTML = '<p style="color:#ef4444; text-align:center;">Server Offline</p>';
         }
     } catch(e) { 
-        console.log("Ping error");
+        // لو حصل خطأ في الطلب، متمسحش الداتا القديمة عشان اللاعب ميشوفش "..."
+        console.log("Status check failed, retrying...");
     }
 }
 
-// التحديث كل 3 ثواني (سرعة الصاروخ)
-setInterval(checkServerStatus, 3000);
-        function togglePlayerList() {
-            const box = document.getElementById('player-list-box');
-            box.style.display = box.style.display === 'block' ? 'none' : 'block';
-        }
+// التحديث كل 5 ثواني (سرعة ممتازة ومستقرة جداً)
+setInterval(checkServerStatus, 5000);
 
         function updateSkin() {
             let name = document.getElementById('pName').value.trim();
