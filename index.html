@@ -141,46 +141,53 @@
         const serverIP = "hyperkingdom.mcsh.io";
         const games = ["Survival", "OneBlock", "BedWars", "The Bridge", "Murder Mystery", "LifestealSMP", "CountrySMP", "Infinite Parkour", "2B2T"];
         let correctValue;
-
-        async function checkServerStatus() {
-            try {
-                // إضافة timestamp عشوائي لإجبار الـ API على التحديث اللحظي
-                const res = await fetch(`https://api.mcstatus.io/v2/status/java/${serverIP}?t=${Date.now()}`);
-                const data = await res.json();
-                
-                const dot = document.getElementById('status-dot');
-                const text = document.getElementById('is-online');
-                const wrapper = document.getElementById('players-wrapper');
-                
-                if(data.online) {
-                    dot.style.background = "#10b981";
-                    text.innerText = `YES (${data.players.online})`;
-                    
-                    // جلب قائمة اللاعبين
-                    if (data.players.list && data.players.list.length > 0) {
-                        wrapper.innerHTML = data.players.list.map(p => `
+async function checkServerStatus() {
+    try {
+        // نستخدم رابط مباشر مع كسر الكاش بقوة
+        const response = await fetch(`https://api.mcstatus.io/v2/status/java/${serverIP}?t=${Math.random()}`);
+        const data = await response.json();
+        
+        const dot = document.getElementById('status-dot');
+        const text = document.getElementById('is-online');
+        const wrapper = document.getElementById('players-wrapper');
+        
+        if(data.online) {
+            dot.style.background = "#10b981";
+            text.innerText = `YES (${data.players.online})`;
+            
+            // الحل النهائي للـ undefined:
+            if (data.players.list && data.players.list.length > 0) {
+                // بنعمل فلتر يطرد أي لاعب ملوش اسم واضح
+                let htmlContent = "";
+                data.players.list.forEach(player => {
+                    if (player && player.name && player.name !== "undefined") {
+                        htmlContent += `
                             <div class="player-item">
-                                <img src="https://mc-heads.net/avatar/${p.name}" alt="head">
-                                <span>${p.name}</span>
-                            </div>
-                        `).join('');
-                    } else if (data.players.online > 0) {
-                        wrapper.innerHTML = `<p style="text-align:center; font-size:0.8rem; color:#aaa;">${data.players.online} Players Online<br>(Names Hidden)</p>`;
-                    } else {
-                        wrapper.innerHTML = `<p style="text-align:center; font-size:0.8rem; color:#666;">No Players</p>`;
+                                <img src="https://mc-heads.net/avatar/${player.name}" onerror="this.src='https://mc-heads.net/avatar/steve'">
+                                <span>${player.name}</span>
+                            </div>`;
                     }
-                } else {
-                    dot.style.background = "#ef4444";
-                    text.innerText = "NO";
-                    wrapper.innerHTML = `<p style="text-align:center; color:#ef4444;">Server Offline</p>`;
-                }
-            } catch(e) { console.log("Update Error"); }
+                });
+                
+                // لو بعد الفلتر لسه فيه أسامي اعرضها، لو مفيش اعرض العدد بس
+                wrapper.innerHTML = htmlContent || `<p style="text-align:center; font-size:0.8rem; color:#aaa;">${data.players.online} Players (Craked)</p>`;
+            } else if (data.players.online > 0) {
+                wrapper.innerHTML = `<p style="text-align:center; font-size:0.8rem; color:#60a5fa; padding:10px;">${data.players.online} Players Online</p>`;
+            } else {
+                wrapper.innerHTML = `<p style="text-align:center; font-size:0.8rem; color:#666;">Empty Server</p>`;
+            }
+        } else {
+            dot.style.background = "#ef4444";
+            text.innerText = "OFFLINE";
+            wrapper.innerHTML = `<p style="text-align:center; color:#ef4444;">Down</p>`;
         }
+    } catch(e) { 
+        console.log("Fast fetch failed"); 
+    }
+}
 
-        function togglePlayerList() {
-            const box = document.getElementById('player-list-box');
-            box.style.display = box.style.display === 'block' ? 'none' : 'block';
-        }
+// التحديث كل 3 ثواني - سرعة جنونية
+setInterval(checkServerStatus, 3000);
 
         function updateSkin() {
             let name = document.getElementById('pName').value.trim();
