@@ -3,243 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HyperKingdom | Official Portal</title>
+    <title>HyperKingdom | Ultimate Portal</title>
     <style>
+        /* التنسيق الأساسي السريع */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html {
-            height: 100%; width: 100%;
-            background: radial-gradient(circle at center, #1e3a8a 0%, #020617 80%);
-            color: white; font-family: 'Segoe UI', sans-serif;
-            display: flex; justify-content: center; align-items: center; overflow: hidden;
-            direction: ltr;
-        }
-        /* حالة السيرفر علجمب */
+        body { background: #020617; color: white; font-family: sans-serif; overflow: hidden; }
+        
         .status-indicator {
             position: fixed; top: 20px; left: 20px;
-            background: rgba(0, 0, 0, 0.7); padding: 12px 20px;
-            border-radius: 15px; border: 1px solid #3b82f6;
-            font-weight: bold; z-index: 100; cursor: pointer;
+            background: rgba(0,0,0,0.8); padding: 10px 15px;
+            border-radius: 10px; border: 1px solid #3b82f6;
+            cursor: pointer; z-index: 1000;
         }
-        /* قائمة اللاعبين */
-        .player-list-container {
-            position: fixed; top: 85px; left: 20px;
-            background: rgba(15, 23, 42, 0.95); padding: 15px;
-            border-radius: 15px; border: 1px solid rgba(59, 130, 246, 0.4);
-            width: 220px; max-height: 350px; overflow-y: auto;
-            z-index: 100; backdrop-filter: blur(10px); display: none;
-        }
-        .player-item {
-            display: flex; align-items: center; gap: 10px;
-            margin-bottom: 10px; padding-bottom: 5px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .player-item img { width: 24px; height: 24px; border-radius: 4px; border: 1px solid #3b82f6; }
-        .player-item span { font-size: 0.85rem; font-family: monospace; color: #60a5fa; }
 
-        /* شاشة الدخول */
-        .main-wrapper {
-            width: 90%; max-width: 450px; padding: 40px; text-align: center;
-            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px;
+        .player-list-container {
+            position: fixed; top: 70px; left: 20px;
+            background: #0f172a; border: 1px solid #1e293b;
+            width: 200px; max-height: 300px; overflow-y: auto;
+            display: none; padding: 10px; border-radius: 8px; z-index: 1000;
         }
-        .secret-menu { display: none; width: 100%; height: 100%; flex-direction: row-reverse; }
-        .sidebar {
-            width: 320px; height: 100vh; background: rgba(15, 23, 42, 0.98);
-            border-left: 1px solid #3b82f6; padding: 30px 20px; display: flex; flex-direction: column; gap: 12px;
-        }
-        .user-profile {
-            display: flex; align-items: center; gap: 12px;
-            background: linear-gradient(90deg, rgba(59, 130, 246, 0.2), transparent);
-            padding: 15px; border-radius: 15px; border: 1px solid rgba(59, 130, 246, 0.3);
-        }
-        .user-profile img { width: 45px; height: 45px; border-radius: 10px; border: 1px solid #3b82f6; }
-        .sidebar-btn {
-            width: 100%; padding: 14px; background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 12px;
-            color: white; cursor: pointer; font-weight: 600; transition: 0.3s; text-align: center; text-decoration: none;
-        }
-        .sidebar-btn:hover { background: #3b82f6; transform: translateX(-5px); }
-        .game-selector-box {
-            margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.4);
-            border-radius: 15px; border: 1px solid #10b981; text-align: center;
-        }
-        #chosen-game { font-size: 1.1rem; color: #10b981; font-weight: bold; margin: 10px 0; }
-        .content-area { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; }
-        .ip-card {
-            background: rgba(16, 185, 129, 0.1); border: 2px dashed #10b981;
-            padding: 30px; border-radius: 20px; text-align: center; cursor: pointer;
-        }
-        .modal {
-            display: none; position: fixed; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); background: #0f172a;
-            border: 2px solid #3b82f6; padding: 30px; border-radius: 20px; z-index: 1000; width: 320px;
-        }
+
+        .player-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 0.9rem; }
+        .player-item img { width: 20px; height: 20px; border-radius: 3px; }
+
+        /* بقية التصميم اللي إنت عارفه */
+        .main-wrapper { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .sidebar-btn { padding: 12px 25px; background: #3b82f6; border: none; color: white; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .secret-menu { display: none; width: 100%; height: 100vh; flex-direction: row-reverse; }
+        .sidebar { width: 300px; background: #0f172a; border-left: 1px solid #3b82f6; padding: 20px; }
+        .content-area { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        input { padding: 10px; border-radius: 5px; border: 1px solid #3b82f6; background: #000; color: #fff; text-align: center; }
     </style>
 </head>
 <body>
 
-    <div class="status-indicator" onclick="togglePlayerList()">
-        <span id="status-dot" style="display:inline-block; width:10px; height:10px; border-radius:50%; background:gray; margin-right:8px;"></span>
-        In Game: <span id="is-online">CHECKING...</span>
+    <div class="status-indicator" onclick="togglePlayers()">
+        <span id="dot" style="color:#ef4444;">●</span> In Game: <span id="count">0</span>
     </div>
 
-    <div id="player-list-box" class="player-list-container">
-        <p style="font-size: 0.8rem; color: #3b82f6; margin-bottom: 10px; font-weight: bold; border-bottom: 1px solid #3b82f6; padding-bottom: 5px;">ONLINE PLAYERS</p>
-        <div id="players-wrapper"></div>
+    <div id="player-box" class="player-list-container">
+        <div id="player-list">Loading...</div>
     </div>
 
-    <div id="overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:900;" onclick="closeModal()"></div>
-    <div id="infoModal" class="modal">
-        <h3 id="modalTitle" style="color:#3b82f6;"></h3>
-        <div id="modalBody" style="margin-top:15px; line-height:1.6; text-align:center;"></div>
-        <button class="sidebar-btn" style="margin-top:20px; background:#3b82f6;" onclick="closeModal()">Close</button>
+    <div id="login" class="main-wrapper">
+        <h1 style="margin-bottom:20px;">HYPERKINGDOM</h1>
+        <input type="text" id="user" placeholder="Username" onkeyup="updateSkin()">
+        <p id="math" style="margin:10px 0;"></p>
+        <input type="number" id="ans" placeholder="?">
+        <button class="sidebar-btn" onclick="login()">ENTER</button>
     </div>
 
-    <div class="main-wrapper" id="login-screen">
-        <h1 style="color:#3b82f6; letter-spacing:5px; margin-bottom:20px;">HYPERKINGDOM</h1>
-        <div style="width:100px; height:100px; margin: 0 auto 20px; border-radius:15px; overflow:hidden; border:2px solid #3b82f6; background:#000;">
-            <img id="pHead" src="https://mc-heads.net/avatar/steve" style="width:100%;">
-        </div>
-        <input type="text" id="pName" placeholder="Minecraft Username" onkeyup="updateSkin()" 
-               style="width:100%; padding:15px; background:rgba(0,0,0,0.5); border:1px solid #1e40af; color:white; border-radius:12px; text-align:center; outline:none;">
-        
-        <div style="background:rgba(59, 130, 246, 0.1); padding:15px; border-radius:12px; margin: 20px 0; border: 1px solid rgba(59,130,246,0.2);">
-            <p id="mathQ" style="font-weight:bold; color:#60a5fa;"></p>
-            <input type="number" id="mathA" placeholder="?" style="width:60px; padding:8px; margin-top:10px; text-align:center; background:#000; border:1px solid #3b82f6; color:white; border-radius:5px;">
-        </div>
-        <button class="sidebar-btn" onclick="unlock()" style="background:#3b82f6; border:none;">ACCESS PORTAL</button>
-    </div>
-
-    <div id="secret-portal" class="secret-menu">
+    <div id="portal" class="secret-menu">
         <div class="sidebar">
-            <div class="user-profile">
-                <img id="menuHead" src="https://mc-heads.net/avatar/steve">
-                <span id="displayName">---</span>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+                <img id="side-head" src="https://mc-heads.net/avatar/steve" style="width:40px;">
+                <span id="side-name">Player</span>
             </div>
-            <div class="sidebar-btn" onclick="openModal('OWNER', 'Managed by: <b>Omar</b>')">CREDITS</div>
-            <div class="sidebar-btn" onclick="openModal('SUPPORT', 'Discord: <b>ryzen_98oox3d</b>')">SUPPORT</div>
-            <a href="https://discord.gg/pmwuB2fY" target="_blank" class="sidebar-btn">DISCORD SERVER</a>
-            <div class="game-selector-box">
-                <p style="font-size: 0.75rem; opacity:0.7;">RANDOM GAME</p>
-                <div id="chosen-game">---</div>
-                <button class="sidebar-btn" style="padding:8px; font-size:0.8rem; border-color:#10b981;" onclick="pickRandomGame()">PICK</button>
+            <button class="sidebar-btn" style="width:100%;" onclick="alert('Owner: Omar')">CREDITS</button>
+            <div style="margin-top:20px; border:1px solid #10b981; padding:10px; border-radius:10px; text-align:center;">
+                <p style="font-size:0.7rem;">RANDOM GAME</p>
+                <h3 id="rand-game">---</h3>
+                <button onclick="pickGame()" style="background:#10b981; border:none; padding:5px; border-radius:5px; color:white; cursor:pointer; margin-top:5px;">PICK</button>
             </div>
-            <div class="sidebar-btn" style="margin-top:auto; color:#ef4444; border-color:#ef4444;" onclick="location.reload()">LOGOUT</div>
         </div>
-
         <div class="content-area">
-            <h2 style="color:#10b981; font-size:2.5rem; margin-bottom:10px;">HYPERKINGDOM</h2>
-            <p style="margin-bottom:40px; opacity:0.6; letter-spacing:2px;">OFFICIAL SERVER PORTAL</p>
-            <div class="ip-card" onclick="copyIP()">
-                <span style="font-size: 1.8rem; font-family: monospace; letter-spacing:3px;">hyperkingdom.mcsh.io</span>
-                <p style="font-size: 0.8rem; color:#10b981; margin-top:10px; font-weight:bold;">[ CLICK TO COPY IP ]</p>
-            </div>
+            <h1 style="color:#10b981;">HYPERKINGDOM</h1>
+            <p>IP: hyperkingdom.mcsh.io</p>
         </div>
     </div>
 
     <script>
-        const serverIP = "hyperkingdom.mcsh.io";
+        const ip = "hyperkingdom.mcsh.io";
         const games = ["Survival", "OneBlock", "BedWars", "The Bridge", "Murder Mystery", "LifestealSMP", "CountrySMP", "Infinite Parkour", "2B2T"];
-        let correctValue;
-async function checkServerStatus() {
-    try {
-        // نستخدم رابط مباشر مع كسر الكاش بقوة
-        const response = await fetch(`https://api.mcstatus.io/v2/status/java/${serverIP}?t=${Math.random()}`);
-        const data = await response.json();
-        
-        const dot = document.getElementById('status-dot');
-        const text = document.getElementById('is-online');
-        const wrapper = document.getElementById('players-wrapper');
-        
-        if(data.online) {
-            dot.style.background = "#10b981";
-            text.innerText = `YES (${data.players.online})`;
-            
-            // الحل النهائي للـ undefined:
-            if (data.players.list && data.players.list.length > 0) {
-                // بنعمل فلتر يطرد أي لاعب ملوش اسم واضح
-                let htmlContent = "";
-                data.players.list.forEach(player => {
-                    if (player && player.name && player.name !== "undefined") {
-                        htmlContent += `
-                            <div class="player-item">
-                                <img src="https://mc-heads.net/avatar/${player.name}" onerror="this.src='https://mc-heads.net/avatar/steve'">
-                                <span>${player.name}</span>
-                            </div>`;
-                    }
-                });
-                
-                // لو بعد الفلتر لسه فيه أسامي اعرضها، لو مفيش اعرض العدد بس
-                wrapper.innerHTML = htmlContent || `<p style="text-align:center; font-size:0.8rem; color:#aaa;">${data.players.online} Players (Craked)</p>`;
-            } else if (data.players.online > 0) {
-                wrapper.innerHTML = `<p style="text-align:center; font-size:0.8rem; color:#60a5fa; padding:10px;">${data.players.online} Players Online</p>`;
-            } else {
-                wrapper.innerHTML = `<p style="text-align:center; font-size:0.8rem; color:#666;">Empty Server</p>`;
-            }
-        } else {
-            dot.style.background = "#ef4444";
-            text.innerText = "OFFLINE";
-            wrapper.innerHTML = `<p style="text-align:center; color:#ef4444;">Down</p>`;
-        }
-    } catch(e) { 
-        console.log("Fast fetch failed"); 
-    }
-}
+        let correct;
 
-// التحديث كل 3 ثواني - سرعة جنونية
-setInterval(checkServerStatus, 3000);
+        // دالة التحديث "الصاروخية"
+        async function update() {
+            try {
+                // استخدام API مختلف تماماً وكسر الكاش بـ Random
+                const res = await fetch(`https://api.minetools.eu/ping/${ip.replace(':', '/')}/${Math.floor(Math.random()*999)}`);
+                const data = await res.json();
+                
+                if(data.error) return;
+
+                document.getElementById('dot').style.color = "#10b981";
+                document.getElementById('count').innerText = data.players.online;
+                
+                let list = document.getElementById('player-list');
+                if(data.players.sample && data.players.sample.length > 0) {
+                    list.innerHTML = data.players.sample.map(p => `
+                        <div class="player-item">
+                            <img src="https://mc-heads.net/avatar/${p.name}">
+                            <span>${p.name}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = "No names available";
+                }
+            } catch(e) {}
+        }
+
+        // لو الـ API اللي فوق فشل، ده API احتياطي شغال في الخلفية
+        async function backupUpdate() {
+            const res = await fetch(`https://mcapi.us/server/status?ip=${ip}`);
+            const data = await res.json();
+            if(data.online) {
+                document.getElementById('count').innerText = data.players.now;
+            }
+        }
+
+        function togglePlayers() {
+            let b = document.getElementById('player-box');
+            b.style.display = b.style.display === 'block' ? 'none' : 'block';
+        }
 
         function updateSkin() {
-            let name = document.getElementById('pName').value.trim();
-            if(name.length > 2) {
-                document.getElementById('pHead').src = `https://mc-heads.net/avatar/${name}`;
-                document.getElementById('menuHead').src = `https://mc-heads.net/avatar/${name}`;
-            }
+            let n = document.getElementById('user').value;
+            document.getElementById('side-head').src = `https://mc-heads.net/avatar/${n}`;
         }
 
-        function pickRandomGame() {
-            const display = document.getElementById('chosen-game');
-            let count = 0;
-            const interval = setInterval(() => {
-                display.innerText = games[Math.floor(Math.random() * games.length)];
-                count++;
-                if(count > 10) { clearInterval(interval); display.style.color = "#10b981"; }
-            }, 80);
+        function pickGame() {
+            document.getElementById('rand-game').innerText = games[Math.floor(Math.random()*games.length)];
         }
 
-        function refreshMath() {
-            let n1 = Math.floor(Math.random() * 9) + 2;
-            let n2 = Math.floor(Math.random() * 9) + 2;
-            correctValue = n1 + n2;
-            document.getElementById('mathQ').innerText = `${n1} + ${n2} = ?`;
+        function login() {
+            let u = document.getElementById('user').value;
+            let a = document.getElementById('ans').value;
+            if(u && parseInt(a) === correct) {
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('portal').style.display = 'flex';
+                document.getElementById('side-name').innerText = u;
+            } else { gen(); }
         }
 
-        function unlock() {
-            let name = document.getElementById('pName').value.trim();
-            let ans = document.getElementById('mathA').value;
-            if(name && parseInt(ans) === correctValue) {
-                document.getElementById('displayName').innerText = name;
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('secret-portal').style.display = 'flex';
-            } else { refreshMath(); }
+        function gen() {
+            let n1 = Math.floor(Math.random()*10), n2 = Math.floor(Math.random()*10);
+            correct = n1 + n2;
+            document.getElementById('math').innerText = `${n1} + ${n2} = ?`;
         }
 
-        function copyIP() { navigator.clipboard.writeText(serverIP); alert("IP Copied!"); }
-        function openModal(t, b) {
-            document.getElementById('modalTitle').innerText = t;
-            document.getElementById('modalBody').innerHTML = b;
-            document.getElementById('infoModal').style.display = 'block';
-            document.getElementById('overlay').style.display = 'block';
-        }
-        function closeModal() {
-            document.getElementById('infoModal').style.display = 'none';
-            document.getElementById('overlay').style.display = 'none';
-        }
-
-        // تحديث كل 5 ثواني (صاروخ ومستقر)
-        checkServerStatus();
-        setInterval(checkServerStatus, 5000);
-        window.onload = refreshMath;
+        setInterval(update, 2000); // تحديث كل ثانيتين!
+        setInterval(backupUpdate, 10000); 
+        gen();
+        update();
     </script>
 </body>
 </html>
