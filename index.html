@@ -105,8 +105,8 @@
                 <span id="sidebar-name" style="font-weight:bold;">---</span>
             </div>
             
-            <button class="side-btn" onclick="openPopup('CREDITS', 'Owner: <b>Omar</b>')">CREDITS</button>
-            <button class="side-btn" onclick="openPopup('RULES', '1. Don\'t start a chat with a cornhub video.<br>2. Respect others.<br>3. Don\'t use hacks.<br>4. Have fun!')">SERVER RULES</button>
+            <button class="side-btn" onclick="openPopup('CREDITS', 'Owner: <b>Omar</b><br>Army Leader: <b>Raslan</b><br>Minister: <b>Hakim</b>')">CREDITS</button>
+            <button class="side-btn" onclick="openPopup('RULES', '1. Don\'t start a chat with a cornhub video.<br>2. Respect others.<br>3. Don\'t try to use hacks.<br>4. Have fun!')">SERVER RULES</button>
             <a href="https://mcsh.io" target="_blank" class="side-btn" style="border-color: #f59e0b; color: #f59e0b;">TRY SERVER HOST</a>
             <a href="https://discord.gg/pmwuB2fY" target="_blank" class="side-btn" style="background:#5865f2; border:none;">JOIN DISCORD</a>
 
@@ -114,7 +114,8 @@
                 <h3 id="roll-res" style="color:#10b981;">---</h3>
                 <button class="side-btn" style="padding:5px; font-size:0.7rem;" onclick="doRoll()">ROLL GAME</button>
             </div>
-            <button class="side-btn" style="margin-top:auto; color:#ef4444; border-color:#ef4444;" onclick="location.reload()">LOGOUT</button>
+            
+            <button class="side-btn" style="margin-top:auto; color:#ef4444; border-color:#ef4444;" onclick="logout()">LOGOUT</button>
         </div>
 
         <div class="main-content" id="main-ui">
@@ -144,24 +145,24 @@
             document.getElementById('math-prompt').innerText = `What is ${n1} + ${n2}?`;
         }
 
-        // 2. Skin Change
-        function changeHead() {
-            const user = document.getElementById('player-name').value.trim();
-            if(user) {
-                const url = `https://mc-heads.net/avatar/${user}`;
+        // 2. Skin Update
+        function changeHead(user = null) {
+            const name = user || document.getElementById('player-name').value.trim();
+            if(name) {
+                const url = `https://mc-heads.net/avatar/${name}`;
                 document.getElementById('head-preview').src = url;
                 document.getElementById('sidebar-head').src = url;
             }
         }
 
-        // 3. Login Check
+        // 3. Login & Saving
         function validateAndEnter() {
             const u = document.getElementById('player-name').value.trim();
             const a = document.getElementById('math-user-answer').value;
             if(u && parseInt(a) === secretAnswer) {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('portal-screen').style.display = 'flex';
-                document.getElementById('sidebar-name').innerText = u;
+                // حفظ في ذاكرة المتصفح
+                localStorage.setItem('hk_username', u);
+                showPortal(u);
             } else {
                 alert("Incorrect math or missing name!");
                 newMath();
@@ -169,7 +170,31 @@
             }
         }
 
-        // 4. Server Check (New API)
+        // وظيفة إظهار الـ Portal
+        function showPortal(username) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('portal-screen').style.display = 'flex';
+            document.getElementById('sidebar-name').innerText = username;
+            changeHead(username);
+        }
+
+        // 4. Persistence (الفحص عند فتح الصفحة)
+        function checkPersistentLogin() {
+            const savedUser = localStorage.getItem('hk_username');
+            if(savedUser) {
+                showPortal(savedUser);
+            } else {
+                newMath(); // لو مش مسجل نولد مسألة جديدة
+            }
+        }
+
+        // 5. Logout
+        function logout() {
+            localStorage.removeItem('hk_username');
+            location.reload(); // إعادة تحميل الصفحة للرجوع لشاشة الدخول
+        }
+
+        // 6. Server Check (API)
         async function refreshServer() {
             try {
                 const response = await fetch('https://api.mcsrvstat.us/2/hyperkingdom.mcsh.io');
@@ -182,8 +207,7 @@
                 if(data.online) {
                     dot.className = 'dot online';
                     count.innerText = data.players.online;
-                    
-                    if(data.players.list && data.players.list.length > 0) {
+                    if(data.players.list) {
                         list.innerHTML = data.players.list.map(name => `
                             <div class="player-row">
                                 <img src="https://mc-heads.net/avatar/${name}" onerror="this.src='https://mc-heads.net/avatar/steve'">
@@ -201,7 +225,7 @@
             } catch(e) { console.error("API Error"); }
         }
 
-        // UI Helpers
+        // UI
         function togglePlayerList() {
             const box = document.getElementById('player-list-box');
             box.style.display = box.style.display === 'block' ? 'none' : 'block';
@@ -228,10 +252,10 @@
             alert('IP Copied!');
         }
 
-        // Start
-        newMath();
+        // التشغيل الابتدائي
+        checkPersistentLogin(); // أول حاجة نشوف لو فيه يوزر متسجل
         refreshServer();
-        setInterval(refreshServer, 10000); // تحديث كل 10 ثواني عشان ميعملش بلوك
+        setInterval(refreshServer, 20000);
     </script>
 </body>
 </html>
