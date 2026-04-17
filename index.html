@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HyperKingdom | Official Portal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="status-indicator" onclick="togglePlayerList()">
+        <span id="status-dot" style="display:inline-block; width:10px; height:10px; border-radius:50%; background:gray; margin-right:8px;"></span>
+        In Game: <span id="is-online">...</span>
+        <div style="font-size: 0.65rem; color: #3b82f6; margin-top: 2px;">(Click for Player List)</div>
+    </div>
+
+    <div id="player-list-box" class="player-list-container">
+        <p style="font-size: 0.8rem; color: #3b82f6; margin-bottom: 10px; font-weight: bold;">ONLINE PLAYERS:</p>
+        <div id="players-wrapper"></div>
+    </div>
+
+    <div id="overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:900;" onclick="closeModal()"></div>
+    <div id="infoModal" class="modal">
+        <h3 id="modalTitle" style="color:#3b82f6;"></h3>
+        <div id="modalBody" style="margin-top:15px; line-height:1.6; text-align:center;"></div>
+        <button class="sidebar-btn" style="margin-top:20px; background:#3b82f6; border:none;" onclick="closeModal()">Close</button>
+    </div>
+
+    <div class="main-wrapper" id="login-screen">
+        <h1 style="color:#3b82f6; letter-spacing:5px; margin-bottom:20px;">HYPERKINGDOM</h1>
+        <div style="width:100px; height:100px; margin: 0 auto 20px; border-radius:15px; overflow:hidden; border:2px solid #3b82f6; background:#000;">
+            <img id="pHead" src="https://mc-heads.net/avatar/steve" style="width:100%;">
+        </div>
+        <input type="text" id="pName" placeholder="Minecraft Username" onkeyup="updateSkin()" 
+               style="width:100%; padding:15px; background:rgba(0,0,0,0.5); border:1px solid #1e40af; color:white; border-radius:12px; text-align:center; outline:none;">
+        
+        <div style="background:rgba(59, 130, 246, 0.1); padding:15px; border-radius:12px; margin: 20px 0; border: 1px solid rgba(59,130,246,0.2);">
+            <p id="mathQ" style="font-weight:bold; color:#60a5fa;"></p>
+            <input type="number" id="mathA" placeholder="?" style="width:60px; padding:8px; margin-top:10px; text-align:center; background:#000; border:1px solid #3b82f6; color:white; border-radius:5px;">
+        </div>
+        <button class="sidebar-btn" onclick="unlock()" style="background:#3b82f6; border:none;">ACCESS PORTAL</button>
+    </div>
+
+    <div id="secret-portal" class="secret-menu">
+        <div class="sidebar">
+            <div class="user-profile">
+                <img id="menuHead" src="https://mc-heads.net/avatar/steve">
+                <span id="displayName">---</span>
+            </div>
+            
+            <div class="sidebar-btn" onclick="openModal('OWNER', 'Managed by: <b>Omar</b>')">CREDITS</div>
+            <div class="sidebar-btn" onclick="openModal('SUPPORT', 'Discord: <b>ryzen_98oox3d</b><br>Scratch: <b>omar1234-is-gamer</b>')">SUPPORT</div>
+            <a href="https://discord.gg/pmwuB2fY" target="_blank" class="sidebar-btn">DISCORD SERVER</a>
+
+            <div class="game-selector-box">
+                <p style="font-size: 0.75rem; opacity:0.7;">DAILY GAME PICKER</p>
+                <div id="chosen-game">---</div>
+                <button class="sidebar-btn" style="padding:8px; font-size:0.8rem; border-color:#10b981;" onclick="pickRandomGame()">PICK RANDOM</button>
+            </div>
+
+            <div class="sidebar-btn" style="margin-top:auto; color:#ef4444; border-color:#ef4444;" onclick="location.reload()">LOGOUT</div>
+        </div>
+
+        <div class="content-area">
+            <h2 style="color:#10b981; font-size:2.5rem; margin-bottom:10px;">HYPERKINGDOM</h2>
+            <p style="margin-bottom:40px; opacity:0.6; letter-spacing:2px;">OFFICIAL SERVER PORTAL</p>
+            
+            <div class="ip-card" onclick="copyIP()">
+                <span style="font-size: 1.8rem; font-family: monospace; letter-spacing:3px;">hyperkingdom.mcsh.io</span>
+                <p style="font-size: 0.8rem; color:#10b981; margin-top:10px; font-weight:bold;">[ CLICK TO COPY IP ]</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const serverIP = "hyperkingdom.mcsh.io";
+        const games = ["Survival", "OneBlock", "BedWars", "The Bridge", "Murder Mystery", "LifestealSMP", "CountrySMP", "Infinite Parkour", "2B2T"];
+        let correctValue;
+
+        // حالة السيرفر وقائمة اللاعبين
+async function checkServerStatus() {
+    try {
+        // استخدام API مختلف وأسرع في التحديث اللحظي
+        // إضافة رقم عشوائي (Math.random) لكسر الكاش تماماً في كل ثانية
+        const res = await fetch(`https://api.minetools.eu/ping/${serverIP.replace(':', '/')}`);
+        const data = await res.json();
+        
+        const dot = document.getElementById('status-dot');
+        const text = document.getElementById('is-online');
+        const wrapper = document.getElementById('players-wrapper');
+        
+        if(!data.error) {
+            dot.style.background = "#10b981";
+            // عدد اللاعبين من الداتا اللحظية
+            const onlineCount = data.players.online;
+            text.innerText = `YES (${onlineCount})`;
+            
+            // جلب الأسامي من عينة اللاعبين (Sample)
+            if (data.players.sample && data.players.sample.length > 0) {
+                wrapper.innerHTML = data.players.sample.map(p => `
+                    <div class="player-item">
+                        <img src="https://mc-heads.net/avatar/${p.name}" alt="head">
+                        <span>${p.name}</span>
+                    </div>
+                `).join('');
+            } else if (onlineCount > 0) {
+                wrapper.innerHTML = `<p style="font-size:0.7rem; color:#60a5fa; text-align:center;">${onlineCount} Players detected...</p>`;
+            } else {
+                wrapper.innerHTML = `<p style="font-size:0.8rem; color:#666; text-align:center;">No one is online</p>`;
+            }
+        } else {
+            dot.style.background = "#ef4444";
+            text.innerText = "NO";
+            wrapper.innerHTML = '<p style="color:#ef4444; text-align:center;">Server Offline</p>';
+        }
+    } catch(e) { 
+        console.log("Ping error");
+    }
+}
+
+// التحديث كل 3 ثواني (سرعة الصاروخ)
+setInterval(checkServerStatus, 3000);
+        function togglePlayerList() {
+            const box = document.getElementById('player-list-box');
+            box.style.display = box.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function updateSkin() {
+            let name = document.getElementById('pName').value.trim();
+            if(name.length > 2) {
+                const skinUrl = `https://mc-heads.net/avatar/${name}`;
+                document.getElementById('pHead').src = skinUrl;
+                document.getElementById('menuHead').src = skinUrl;
+            }
+        }
+
+        function pickRandomGame() {
+            const display = document.getElementById('chosen-game');
+            let count = 0;
+            const interval = setInterval(() => {
+                display.innerText = games[Math.floor(Math.random() * games.length)];
+                count++;
+                if(count > 12) {
+                    clearInterval(interval);
+                    display.style.color = "#3b82f6";
+                    setTimeout(() => display.style.color = "#10b981", 300);
+                }
+            }, 80);
+        }
+
+        function refreshMath() {
+            let n1 = Math.floor(Math.random() * 9) + 2;
+            let n2 = Math.floor(Math.random() * 9) + 2;
+            correctValue = n1 + n2;
+            document.getElementById('mathQ').innerText = `${n1} + ${n2} = ?`;
+        }
+
+        function unlock() {
+            let name = document.getElementById('pName').value.trim();
+            let ans = document.getElementById('mathA').value;
+            if(name && parseInt(ans) === correctValue) {
+                document.getElementById('displayName').innerText = name;
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('secret-portal').style.display = 'flex';
+            } else { refreshMath(); document.getElementById('mathA').value = ""; }
+        }
+
+        function copyIP() { navigator.clipboard.writeText(serverIP); alert("IP Copied!"); }
+        function openModal(t, b) {
+            document.getElementById('modalTitle').innerText = t;
+            document.getElementById('modalBody').innerHTML = b;
+            document.getElementById('infoModal').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
+        function closeModal() {
+            document.getElementById('infoModal').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        checkServerStatus();
+        setInterval(checkServerStatus, 30000);
+        window.onload = refreshMath;
+    </script>
+</body>
+</html>

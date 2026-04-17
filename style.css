@@ -1,0 +1,88 @@
+/* style.css */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body, html {
+    height: 100%; width: 100%;
+    background: radial-gradient(circle at center, #1e3a8a 0%, #020617 80%);
+    color: white; font-family: 'Segoe UI', sans-serif;
+    display: flex; justify-content: center; align-items: center; overflow: hidden;
+    direction: ltr;
+}
+
+/* حالة السيرفر علجمب */
+.status-indicator {
+    position: fixed; top: 20px; left: 20px;
+    background: rgba(0, 0, 0, 0.7); padding: 12px 20px;
+    border-radius: 15px; border: 1px solid #3b82f6;
+    font-weight: bold; z-index: 100; cursor: pointer;
+    transition: 0.3s;
+}
+.status-indicator:hover { background: rgba(59, 130, 246, 0.2); }
+
+/* قائمة اللاعبين */
+.player-list-container {
+    position: fixed; top: 85px; left: 20px;
+    background: rgba(15, 23, 42, 0.9); padding: 15px;
+    border-radius: 15px; border: 1px solid rgba(59, 130, 246, 0.4);
+    width: 220px; max-height: 350px; overflow-y: auto;
+    z-index: 100; backdrop-filter: blur(10px); display: none;
+}
+
+.player-item {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px; padding-bottom: 5px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.player-item img { width: 24px; height: 24px; border-radius: 4px; }
+.player-item span { font-size: 0.85rem; font-family: monospace; }
+
+/* شاشة الدخول */
+.main-wrapper {
+    width: 90%; max-width: 450px; padding: 40px; text-align: center;
+    background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px;
+}
+
+/* القائمة السرية */
+.secret-menu { display: none; width: 100%; height: 100%; flex-direction: row-reverse; }
+
+.sidebar {
+    width: 320px; height: 100vh; background: rgba(15, 23, 42, 0.98);
+    backdrop-filter: blur(25px); border-left: 1px solid #3b82f6;
+    padding: 30px 20px; display: flex; flex-direction: column; gap: 12px;
+}
+
+.user-profile {
+    display: flex; align-items: center; gap: 12px;
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.2), transparent);
+    padding: 15px; border-radius: 15px; border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.user-profile img { width: 45px; height: 45px; border-radius: 10px; border: 1px solid #3b82f6; }
+
+.sidebar-btn {
+    width: 100%; padding: 14px; background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 12px;
+    color: white; cursor: pointer; font-weight: 600; transition: 0.3s;
+    text-align: center; text-decoration: none; outline: none;
+}
+.sidebar-btn:hover { background: #3b82f6; transform: translateX(-5px); }
+
+.game-selector-box {
+    margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.4);
+    border-radius: 15px; border: 1px solid #10b981; text-align: center;
+}
+#chosen-game { font-size: 1.1rem; color: #10b981; font-weight: bold; margin: 10px 0; }
+
+.content-area { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; }
+
+.ip-card {
+    background: rgba(16, 185, 129, 0.1); border: 2px dashed #10b981;
+    padding: 30px; border-radius: 20px; text-align: center; cursor: pointer;
+}
+
+.modal {
+    display: none; position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); background: #0f172a;
+    border: 2px solid #3b82f6; padding: 30px; border-radius: 20px; z-index: 1000; width: 320px;
+}
