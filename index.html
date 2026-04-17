@@ -136,7 +136,6 @@
         let correctMath;
         const games = ["Survival", "OneBlock", "BedWars", "The Bridge", "Murder Mystery", "LifestealSMP"];
 
-        // 1. تحديث السكن (شغال 100% الآن)
         function updateSkinPreview() {
             const name = document.getElementById('username').value.trim();
             if(name.length > 0) {
@@ -146,7 +145,6 @@
             }
         }
 
-        // 2. المسألة الرياضية
         function generateMath() {
             const a = Math.floor(Math.random() * 8) + 2;
             const b = Math.floor(Math.random() * 8) + 2;
@@ -154,7 +152,6 @@
             document.getElementById('math-question').innerText = `Security: ${a} + ${b} = ?`;
         }
 
-        // 3. فحص الدخول
         function checkLogin() {
             const user = document.getElementById('username').value.trim();
             const ans = document.getElementById('math-answer').value;
@@ -169,23 +166,42 @@
             }
         }
 
-        // 4. حالة السيرفر واللاعبين
         async function updateStatus() {
             try {
                 const res = await fetch(`https://api.mcstatus.io/v2/status/java/hyperkingdom.mcsh.io?t=${Date.now()}`);
                 const data = await res.json();
-                document.getElementById('status-dot').className = data.online ? 'dot online' : 'dot';
-                document.getElementById('online-count').innerText = data.online ? data.players.online : "OFFLINE";
                 
-                if(data.online && data.players.list) {
-                    document.getElementById('list-content').innerHTML = data.players.list.map(p => `
-                        <div class="player-row">
-                            <img src="https://mc-heads.net/avatar/${p.name}">
-                            <span>${p.name}</span>
-                        </div>
-                    `).join('');
+                const dot = document.getElementById('status-dot');
+                const count = document.getElementById('online-count');
+                const list = document.getElementById('list-content');
+
+                if(data.online) {
+                    dot.className = 'dot online';
+                    count.innerText = data.players.online;
+                    
+                    // حل مشكلة الـ undefined: نتاكد ان الـ list موجودة وليست فارغة
+                    if(data.players.list && data.players.list.length > 0) {
+                        list.innerHTML = data.players.list.map(p => {
+                            // فحص إضافي لكل لاعب عشان نمنع الـ undefined في الاسم
+                            const playerName = p.name ? p.name : "Unknown Player";
+                            return `
+                                <div class="player-row">
+                                    <img src="https://mc-heads.net/avatar/${playerName}">
+                                    <span>${playerName}</span>
+                                </div>
+                            `;
+                        }).join('');
+                    } else {
+                        list.innerHTML = `<p style="padding:15px; font-size:0.75rem; text-align:center; color:#60a5fa;">${data.players.online} Player(s) Online</p>`;
+                    }
+                } else {
+                    dot.className = 'dot';
+                    count.innerText = "OFFLINE";
+                    list.innerHTML = `<p style="padding:15px; font-size:0.75rem; text-align:center; color:#ef4444;">Server Offline</p>`;
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.log("Status Fetch Error");
+            }
         }
 
         function showPopup(title, body) {
@@ -201,23 +217,4 @@
         }
 
         function toggleList() {
-            const d = document.getElementById('player-dropdown');
-            d.style.display = d.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function rollGame() {
-            document.getElementById('game-res').innerText = games[Math.floor(Math.random()*games.length)];
-        }
-
-        function copyIP() {
-            navigator.clipboard.writeText('hyperkingdom.mcsh.io');
-            alert('IP Copied!');
-        }
-
-        // تشغيل الوظائف عند التحميل
-        generateMath();
-        updateStatus();
-        setInterval(updateStatus, 5000);
-    </script>
-</body>
-</html>
+            const d = document.getElementById('player-
