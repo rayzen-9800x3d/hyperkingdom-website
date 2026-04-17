@@ -13,17 +13,18 @@
             display: flex; justify-content: center; align-items: center; overflow: hidden;
         }
 
+        /* Animations */
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
 
+        /* Status & Players */
         .status-card {
             position: fixed; top: 20px; left: 20px;
             background: rgba(15, 23, 42, 0.9); padding: 12px 20px;
             border-radius: 12px; border: 1px solid #3b82f6;
             z-index: 1000; cursor: pointer; display: flex; align-items: center; gap: 10px;
-            transition: 0.3s; backdrop-filter: blur(10px);
         }
-        .dot { width: 10px; height: 10px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #ef4444; }
         .dot.online { background: #10b981; box-shadow: 0 0 10px #10b981; }
 
         .player-dropdown {
@@ -35,41 +36,39 @@
         .player-row { display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .player-row img { width: 25px; height: 25px; border-radius: 5px; }
 
-        .glass-box {
-            width: 400px; padding: 40px; background: rgba(15, 23, 42, 0.8);
-            border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center; backdrop-filter: blur(20px);
-        }
-
+        /* Popups */
         .info-popup {
             position: fixed; right: 340px; top: 50%; transform: translateY(-50%);
             width: 320px; background: rgba(15, 23, 42, 0.95);
             border: 2px solid #3b82f6; border-radius: 20px; padding: 25px;
-            display: none; z-index: 2000; animation: slideIn 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            display: none; z-index: 2000; animation: slideIn 0.4s ease-out;
         }
-        .close-popup { position: absolute; top: 10px; right: 15px; cursor: pointer; color: #ef4444; font-weight: bold; font-size: 1.2rem; }
 
+        /* Login Screen */
+        .glass-box {
+            width: 400px; padding: 40px; background: rgba(15, 23, 42, 0.9);
+            border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center; backdrop-filter: blur(20px);
+        }
+
+        /* Portal Layout */
         .portal-container { display: none; width: 100%; height: 100%; flex-direction: row-reverse; }
         .sidebar {
             width: 320px; background: #0f172a; border-left: 2px solid #3b82f6;
-            padding: 30px 20px; display: flex; flex-direction: column; gap: 15px; z-index: 1500;
+            padding: 30px 20px; display: flex; flex-direction: column; gap: 15px;
         }
+
         .side-btn {
             width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #3b82f6;
             background: rgba(59, 130, 246, 0.1); color: white; cursor: pointer;
             font-weight: bold; transition: 0.3s; text-align: center; text-decoration: none;
         }
-        .side-btn:hover { background: #3b82f6; transform: translateX(-5px); }
+        .side-btn:hover { background: #3b82f6; }
 
+        input { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #1e40af; background: #000; color: white; text-align: center; outline: none; }
+        
         .main-content { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: float 4s infinite ease-in-out; }
-        .ip-box {
-            background: rgba(16, 185, 129, 0.1); border: 2px dashed #10b981;
-            padding: 35px; border-radius: 20px; cursor: pointer; transition: 0.3s;
-        }
-        .ip-box:hover { background: rgba(16, 185, 129, 0.2); transform: scale(1.05); }
-
-        input { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #1e40af; background: #000; color: white; text-align: center; }
+        .ip-box { background: rgba(16, 185, 129, 0.1); border: 2px dashed #10b981; padding: 35px; border-radius: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -80,21 +79,145 @@
     </div>
 
     <div id="player-dropdown" class="player-dropdown">
-        <div style="padding:10px; font-size:0.8rem; color:#60a5fa; border-bottom:1px solid #3b82f6;">ONLINE PLAYERS</div>
         <div id="list-content"></div>
     </div>
 
     <div id="popup-box" class="info-popup">
-        <span class="close-popup" onclick="closePopup()">×</span>
-        <h3 id="popup-title" style="color:#3b82f6; margin-bottom:15px; border-bottom: 1px solid #3b82f6; padding-bottom: 10px;"></h3>
+        <h3 id="popup-title" style="color:#3b82f6; margin-bottom:15px;"></h3>
         <p id="popup-body" style="font-size:0.95rem; line-height:1.8; text-align: left;"></p>
-        <button class="side-btn" style="margin-top:20px; padding:8px; font-size:0.8rem;" onclick="closePopup()">BACK TO HOME</button>
+        <button class="side-btn" style="margin-top:20px;" onclick="closePopup()">CLOSE</button>
     </div>
 
     <div id="login-page" class="glass-box">
-        <h1 style="color:#3b82f6; letter-spacing:3px; margin-bottom:20px;">HYPERKINGDOM</h1>
+        <h1 style="color:#3b82f6; margin-bottom:20px;">HYPERKINGDOM</h1>
         <div style="width:80px; height:80px; margin: 0 auto 15px; border-radius:15px; border:2px solid #3b82f6; overflow:hidden;">
             <img id="login-head" src="https://mc-heads.net/avatar/steve" style="width:100%;">
         </div>
-        <input type="text" id="user-input" placeholder="Minecraft Name" oninput="updateHeads()">
-        <div style="background:rgba(59,130,246,0.1); padding:10px; border-radius:10px; margin-bottom
+        
+        <input type="text" id="username" placeholder="Minecraft Name" oninput="updateSkinPreview()">
+        
+        <div style="background:rgba(59,130,246,0.1); padding:10px; border-radius:10px; margin-bottom:15px;">
+            <p id="math-question" style="color:#60a5fa; font-weight:bold;"></p>
+            <input type="number" id="math-answer" placeholder="?" style="width:80px; margin-top:5px; margin-bottom:0;">
+        </div>
+        
+        <button class="side-btn" onclick="checkLogin()" style="background:#3b82f6;">ENTER PORTAL</button>
+    </div>
+
+    <div id="portal-page" class="portal-container">
+        <div class="sidebar">
+            <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:15px; border-radius:12px;">
+                <img id="side-head" src="https://mc-heads.net/avatar/steve" style="width:40px; border-radius:5px;">
+                <span id="side-name" style="font-weight:bold;">---</span>
+            </div>
+            
+            <button class="side-btn" onclick="showPopup('CREDITS', 'Managed by: <b>Omar</b><br>Army Leader: <b>Raslan</b><br>Minister: <b>Hakim</b>')">CREDITS</button>
+            <button class="side-btn" onclick="showPopup('SERVER RULES', '1. Don\'t start a chat with a cornhub video or things about it.<br>2. Respect others.<br>3. Don\'t try to use hacks.<br>4. Have fun!')">SERVER RULES</button>
+            <a href="https://mcsh.io" target="_blank" class="side-btn" style="border-color: #f59e0b; color: #f59e0b;">TRY SERVER HOST</a>
+            <a href="https://discord.gg/pmwuB2fY" target="_blank" class="side-btn" style="background:#5865f2; border:none;">JOIN DISCORD</a>
+
+            <div style="background:rgba(16, 185, 129, 0.1); border:1px solid #10b981; padding:15px; border-radius:12px; text-align:center;">
+                <h3 id="game-res" style="margin:5px 0;">---</h3>
+                <button class="side-btn" style="padding:5px; font-size:0.7rem;" onclick="rollGame()">ROLL GAME</button>
+            </div>
+            <button class="side-btn" style="margin-top:auto; color:#ef4444; border-color:#ef4444;" onclick="location.reload()">LOGOUT</button>
+        </div>
+
+        <div class="main-content" id="main-area">
+            <h1 style="color:#10b981; font-size:3.5rem;">HYPERKINGDOM</h1>
+            <div class="ip-box" onclick="copyIP()">
+                <h2 style="color:#10b981; font-family:monospace;">hyperkingdom.mcsh.io</h2>
+                <p style="font-size:0.7rem; opacity:0.5;">[ CLICK TO COPY ]</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let correctMath;
+        const games = ["Survival", "OneBlock", "BedWars", "The Bridge", "Murder Mystery", "LifestealSMP"];
+
+        // 1. تحديث السكن (شغال 100% الآن)
+        function updateSkinPreview() {
+            const name = document.getElementById('username').value.trim();
+            if(name.length > 0) {
+                const url = `https://mc-heads.net/avatar/${name}`;
+                document.getElementById('login-head').src = url;
+                document.getElementById('side-head').src = url;
+            }
+        }
+
+        // 2. المسألة الرياضية
+        function generateMath() {
+            const a = Math.floor(Math.random() * 8) + 2;
+            const b = Math.floor(Math.random() * 8) + 2;
+            correctMath = a + b;
+            document.getElementById('math-question').innerText = `Security: ${a} + ${b} = ?`;
+        }
+
+        // 3. فحص الدخول
+        function checkLogin() {
+            const user = document.getElementById('username').value.trim();
+            const ans = document.getElementById('math-answer').value;
+            if(user && parseInt(ans) === correctMath) {
+                document.getElementById('login-page').style.display = 'none';
+                document.getElementById('portal-page').style.display = 'flex';
+                document.getElementById('side-name').innerText = user;
+            } else {
+                alert("Wrong Answer or Empty Name!");
+                generateMath();
+                document.getElementById('math-answer').value = "";
+            }
+        }
+
+        // 4. حالة السيرفر واللاعبين
+        async function updateStatus() {
+            try {
+                const res = await fetch(`https://api.mcstatus.io/v2/status/java/hyperkingdom.mcsh.io?t=${Date.now()}`);
+                const data = await res.json();
+                document.getElementById('status-dot').className = data.online ? 'dot online' : 'dot';
+                document.getElementById('online-count').innerText = data.online ? data.players.online : "OFFLINE";
+                
+                if(data.online && data.players.list) {
+                    document.getElementById('list-content').innerHTML = data.players.list.map(p => `
+                        <div class="player-row">
+                            <img src="https://mc-heads.net/avatar/${p.name}">
+                            <span>${p.name}</span>
+                        </div>
+                    `).join('');
+                }
+            } catch(e) {}
+        }
+
+        function showPopup(title, body) {
+            document.getElementById('popup-title').innerText = title;
+            document.getElementById('popup-body').innerHTML = body;
+            document.getElementById('popup-box').style.display = 'block';
+            document.getElementById('main-area').style.opacity = '0.2';
+        }
+
+        function closePopup() {
+            document.getElementById('popup-box').style.display = 'none';
+            document.getElementById('main-area').style.opacity = '1';
+        }
+
+        function toggleList() {
+            const d = document.getElementById('player-dropdown');
+            d.style.display = d.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function rollGame() {
+            document.getElementById('game-res').innerText = games[Math.floor(Math.random()*games.length)];
+        }
+
+        function copyIP() {
+            navigator.clipboard.writeText('hyperkingdom.mcsh.io');
+            alert('IP Copied!');
+        }
+
+        // تشغيل الوظائف عند التحميل
+        generateMath();
+        updateStatus();
+        setInterval(updateStatus, 5000);
+    </script>
+</body>
+</html>
