@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HyperKingdom | Official Portal</title>
     <style>
-        /* الأساسيات والأنيميشن */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html {
             height: 100%; width: 100%;
@@ -17,7 +16,6 @@
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
 
-        /* حالة السيرفر */
         .status-card {
             position: fixed; top: 20px; left: 20px;
             background: rgba(15, 23, 42, 0.9); padding: 12px 20px;
@@ -28,7 +26,6 @@
         .dot { width: 10px; height: 10px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 10px #ef4444; }
         .dot.online { background: #10b981; box-shadow: 0 0 10px #10b981; }
 
-        /* قائمة اللاعبين */
         .player-dropdown {
             position: fixed; top: 80px; left: 20px;
             background: rgba(15, 23, 42, 0.98); width: 240px;
@@ -38,27 +35,21 @@
         .player-row { display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .player-row img { width: 25px; height: 25px; border-radius: 5px; }
 
-        /* الشاشة الرئيسية */
         .glass-box {
             width: 400px; padding: 40px; background: rgba(15, 23, 42, 0.8);
             border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.1);
             text-align: center; backdrop-filter: blur(20px);
         }
 
-        /* الـ Popups الجديدة */
         .info-popup {
             position: fixed; right: 340px; top: 50%; transform: translateY(-50%);
-            width: 300px; background: rgba(15, 23, 42, 0.95);
-            border: 1px solid #3b82f6; border-radius: 20px; padding: 25px;
+            width: 320px; background: rgba(15, 23, 42, 0.95);
+            border: 2px solid #3b82f6; border-radius: 20px; padding: 25px;
             display: none; z-index: 2000; animation: slideIn 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
             box-shadow: -10px 0 30px rgba(0,0,0,0.5);
         }
-        .close-popup {
-            position: absolute; top: 10px; right: 15px; cursor: pointer;
-            color: #ef4444; font-weight: bold; font-size: 1.2rem;
-        }
+        .close-popup { position: absolute; top: 10px; right: 15px; cursor: pointer; color: #ef4444; font-weight: bold; font-size: 1.2rem; }
 
-        /* البورتال والسايدبار */
         .portal-container { display: none; width: 100%; height: 100%; flex-direction: row-reverse; }
         .sidebar {
             width: 320px; background: #0f172a; border-left: 2px solid #3b82f6;
@@ -67,7 +58,7 @@
         .side-btn {
             width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #3b82f6;
             background: rgba(59, 130, 246, 0.1); color: white; cursor: pointer;
-            font-weight: bold; transition: 0.3s; text-align: center;
+            font-weight: bold; transition: 0.3s; text-align: center; text-decoration: none;
         }
         .side-btn:hover { background: #3b82f6; transform: translateX(-5px); }
 
@@ -95,9 +86,9 @@
 
     <div id="popup-box" class="info-popup">
         <span class="close-popup" onclick="closePopup()">×</span>
-        <h3 id="popup-title" style="color:#3b82f6; margin-bottom:10px;"></h3>
-        <p id="popup-body" style="font-size:0.9rem; line-height:1.6;"></p>
-        <button class="side-btn" style="margin-top:20px; padding:8px; font-size:0.8rem;" onclick="backToMain()">BACK TO IP</button>
+        <h3 id="popup-title" style="color:#3b82f6; margin-bottom:15px; border-bottom: 1px solid #3b82f6; padding-bottom: 10px;"></h3>
+        <p id="popup-body" style="font-size:0.95rem; line-height:1.8; text-align: left;"></p>
+        <button class="side-btn" style="margin-top:20px; padding:8px; font-size:0.8rem;" onclick="closePopup()">BACK TO HOME</button>
     </div>
 
     <div id="login-page" class="glass-box">
@@ -106,123 +97,4 @@
             <img id="login-head" src="https://mc-heads.net/avatar/steve" style="width:100%;">
         </div>
         <input type="text" id="user-input" placeholder="Minecraft Name" oninput="updateHeads()">
-        <div style="background:rgba(59,130,246,0.1); padding:10px; border-radius:10px; margin-bottom:15px;">
-            <p id="math-q" style="color:#60a5fa;"></p>
-            <input type="number" id="math-a" placeholder="?" style="width:80px; margin-top:5px;">
-        </div>
-        <button class="side-btn" onclick="login()" style="background:#3b82f6;">ENTER PORTAL</button>
-    </div>
-
-    <div id="portal-page" class="portal-container">
-        <div class="sidebar">
-            <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:15px; border-radius:12px;">
-                <img id="side-head" src="https://mc-heads.net/avatar/steve" style="width:40px; border-radius:5px;">
-                <span id="side-name" style="font-weight:bold;">---</span>
-            </div>
-            
-            <button class="side-btn" onclick="showPopup('CREDITS', 'Managed by: <b>Omar</b><br>Discord: <b>ryzen_98oox3d</b><br>The King of ROO!')">CREDITS</button>
-            <button class="side-btn" onclick="showPopup('RULES', '1. No Grieving<br>2. Respect Admin Hakim<br>3. No Hacking<br>4. Have Fun!')">SERVER RULES</button>
-            <button class="side-btn" onclick="showPopup('VOTE', 'Vote for HyperKingdom on TopG to get Diamond Keys!')">VOTE REWARDS</button>
-            <a href="https://discord.gg/pmwuB2fY" target="_blank" class="side-btn" style="background:#5865f2; border:none;">JOIN DISCORD</a>
-
-            <div style="background:rgba(16, 185, 129, 0.1); border:1px solid #10b981; padding:15px; border-radius:12px; text-align:center;">
-                <p style="font-size:0.7rem; color:#10b981;">RECOMMENDED</p>
-                <h3 id="game-res" style="margin:5px 0;">---</h3>
-                <button class="side-btn" style="padding:5px; font-size:0.7rem; border-color:#10b981;" onclick="roll()">ROLL</button>
-            </div>
-            
-            <button class="side-btn" style="margin-top:auto; color:#ef4444; border-color:#ef4444;" onclick="location.reload()">LOGOUT</button>
-        </div>
-
-        <div class="main-content" id="main-content-area">
-            <h1 style="color:#10b981; font-size:3.5rem; text-shadow: 0 0 20px rgba(16,185,129,0.3);">HYPERKINGDOM</h1>
-            <p style="opacity:0.6; letter-spacing:4px; font-weight:bold; margin-bottom:30px;">OFFICIAL PORTAL</p>
-            <div class="ip-box" onclick="navigator.clipboard.writeText('hyperkingdom.mcsh.io'); alert('IP Copied!')">
-                <h2 style="color:#10b981; font-family:monospace;">hyperkingdom.mcsh.io</h2>
-                <p style="font-size:0.7rem; opacity:0.5; margin-top:10px;">[ CLICK TO COPY ]</p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const games = ["Survival", "OneBlock", "BedWars", "The Bridge", "Murder Mystery", "LifestealSMP", "CountrySMP", "Infinite Parkour", "2B2T"];
-        let mathRes;
-
-        // تحديث السيرفر
-        async function update() {
-            try {
-                const res = await fetch(`https://api.mcstatus.io/v2/status/java/hyperkingdom.mcsh.io?t=${Date.now()}`);
-                const data = await res.json();
-                document.getElementById('status-dot').className = data.online ? 'dot online' : 'dot';
-                document.getElementById('online-count').innerText = data.online ? data.players.online : "OFFLINE";
-                
-                if(data.online && data.players.list) {
-                    document.getElementById('list-content').innerHTML = data.players.list.map(p => `
-                        <div class="player-row">
-                            <img src="https://mc-heads.net/avatar/${p.name}">
-                            <span>${p.name}</span>
-                        </div>
-                    `).join('');
-                } else {
-                    document.getElementById('list-content').innerHTML = '<p style="padding:10px; font-size:0.7rem; color:#666;">No player data</p>';
-                }
-            } catch(e) {}
-        }
-
-        // Popups Logic
-        function showPopup(title, body) {
-            document.getElementById('popup-title').innerText = title;
-            document.getElementById('popup-body').innerHTML = body;
-            document.getElementById('popup-box').style.display = 'block';
-            // إخفاء الـ IP مؤقتاً لتركيز النظر على الـ Popup (اختياري)
-            document.getElementById('main-content-area').style.opacity = '0.3';
-        }
-
-        function closePopup() {
-            document.getElementById('popup-box').style.display = 'none';
-            document.getElementById('main-content-area').style.opacity = '1';
-        }
-
-        function backToMain() {
-            closePopup();
-        }
-
-        function updateHeads() {
-            const n = document.getElementById('user-input').value.trim();
-            if(n) {
-                document.getElementById('login-head').src = `https://mc-heads.net/avatar/${n}`;
-                document.getElementById('side-head').src = `https://mc-heads.net/avatar/${n}`;
-            }
-        }
-
-        function login() {
-            const u = document.getElementById('user-input').value;
-            const a = document.getElementById('math-a').value;
-            if(u && parseInt(a) === mathRes) {
-                document.getElementById('login-page').style.display = 'none';
-                document.getElementById('portal-page').style.display = 'flex';
-                document.getElementById('side-name').innerText = u;
-            } else { gen(); }
-        }
-
-        function gen() {
-            const n1 = Math.floor(Math.random()*9)+2, n2 = Math.floor(Math.random()*9)+2;
-            mathRes = n1 + n2;
-            document.getElementById('math-q').innerText = `Security: ${n1} + ${n2} = ?`;
-        }
-
-        function toggleList() {
-            const d = document.getElementById('player-dropdown');
-            d.style.display = d.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function roll() {
-            document.getElementById('game-res').innerText = games[Math.floor(Math.random()*games.length)];
-        }
-
-        gen();
-        update();
-        setInterval(update, 5000);
-    </script>
-</body>
-</html>
+        <div style="background:rgba(59,130,246,0.1); padding:10px; border-radius:10px; margin-bottom
