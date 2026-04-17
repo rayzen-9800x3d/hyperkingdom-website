@@ -17,7 +17,7 @@
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
 
-        /* Status & Players */
+        /* Server Info */
         .status-card {
             position: fixed; top: 20px; left: 20px;
             background: rgba(15, 23, 42, 0.9); padding: 12px 20px;
@@ -34,15 +34,7 @@
             border: 1px solid #3b82f6; display: none; z-index: 1000;
         }
         .player-row { display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .player-row img { width: 25px; height: 25px; border-radius: 5px; }
-
-        /* Popups */
-        .info-popup {
-            position: fixed; right: 340px; top: 50%; transform: translateY(-50%);
-            width: 320px; background: rgba(15, 23, 42, 0.95);
-            border: 2px solid #3b82f6; border-radius: 20px; padding: 25px;
-            display: none; z-index: 2000; animation: slideIn 0.4s ease-out;
-        }
+        .player-row img { width: 25px; height: 25px; border-radius: 4px; }
 
         /* Login Screen */
         .glass-box {
@@ -51,13 +43,12 @@
             text-align: center; backdrop-filter: blur(20px);
         }
 
-        /* Portal Layout */
+        /* Portal Page */
         .portal-container { display: none; width: 100%; height: 100%; flex-direction: row-reverse; }
         .sidebar {
             width: 320px; background: #0f172a; border-left: 2px solid #3b82f6;
             padding: 30px 20px; display: flex; flex-direction: column; gap: 15px;
         }
-
         .side-btn {
             width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #3b82f6;
             background: rgba(59, 130, 246, 0.1); color: white; cursor: pointer;
@@ -65,156 +56,182 @@
         }
         .side-btn:hover { background: #3b82f6; }
 
-        input { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #1e40af; background: #000; color: white; text-align: center; outline: none; }
+        input { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #1e40af; background: #000; color: white; text-align: center; outline: none; font-size: 1rem; }
         
         .main-content { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: float 4s infinite ease-in-out; }
         .ip-box { background: rgba(16, 185, 129, 0.1); border: 2px dashed #10b981; padding: 35px; border-radius: 20px; cursor: pointer; }
+
+        /* Popup */
+        .info-popup {
+            position: fixed; right: 340px; top: 50%; transform: translateY(-50%);
+            width: 320px; background: rgba(15, 23, 42, 0.95);
+            border: 2px solid #3b82f6; border-radius: 20px; padding: 25px;
+            display: none; z-index: 2000; animation: slideIn 0.3s ease-out;
+        }
     </style>
 </head>
 <body>
 
-    <div class="status-card" onclick="toggleList()">
+    <div class="status-card" onclick="togglePlayerList()">
         <div id="status-dot" class="dot"></div>
-        <span>In Game: <span id="online-count">...</span></span>
+        <span>Players: <span id="player-count">...</span></span>
     </div>
 
-    <div id="player-dropdown" class="player-dropdown">
-        <div id="list-content"></div>
+    <div id="player-list-box" class="player-dropdown">
+        <div style="padding:10px; font-size:0.8rem; color:#3b82f6; border-bottom:1px solid #3b82f6;">ONLINE PLAYERS</div>
+        <div id="list-container"></div>
     </div>
 
-    <div id="popup-box" class="info-popup">
-        <h3 id="popup-title" style="color:#3b82f6; margin-bottom:15px;"></h3>
-        <p id="popup-body" style="font-size:0.95rem; line-height:1.8; text-align: left;"></p>
-        <button class="side-btn" style="margin-top:20px;" onclick="closePopup()">CLOSE</button>
-    </div>
-
-    <div id="login-page" class="glass-box">
+    <div id="login-screen" class="glass-box">
         <h1 style="color:#3b82f6; margin-bottom:20px;">HYPERKINGDOM</h1>
-        <div style="width:80px; height:80px; margin: 0 auto 15px; border-radius:15px; border:2px solid #3b82f6; overflow:hidden;">
-            <img id="login-head" src="https://mc-heads.net/avatar/steve" style="width:100%;">
+        <div style="width:80px; height:80px; margin: 0 auto 15px; border-radius:15px; border:2px solid #3b82f6; overflow:hidden; background:#000;">
+            <img id="head-preview" src="https://mc-heads.net/avatar/steve" style="width:100%;">
         </div>
         
-        <input type="text" id="username" placeholder="Minecraft Name" oninput="updateSkinPreview()">
+        <input type="text" id="player-name" placeholder="Minecraft Username" oninput="changeHead()">
         
-        <div style="background:rgba(59,130,246,0.1); padding:10px; border-radius:10px; margin-bottom:15px;">
-            <p id="math-question" style="color:#60a5fa; font-weight:bold;"></p>
-            <input type="number" id="math-answer" placeholder="?" style="width:80px; margin-top:5px; margin-bottom:0;">
+        <div style="background:rgba(59, 130, 246, 0.1); padding:15px; border-radius:12px; margin-bottom:15px;">
+            <p id="math-prompt" style="color:#60a5fa; font-weight:bold;"></p>
+            <input type="number" id="math-user-answer" placeholder="Result?" style="width:100px; margin-top:10px; margin-bottom:0;">
         </div>
         
-        <button class="side-btn" onclick="checkLogin()" style="background:#3b82f6;">ENTER PORTAL</button>
+        <button class="side-btn" onclick="validateAndEnter()" style="background:#3b82f6; border:none;">ENTER PORTAL</button>
     </div>
 
-    <div id="portal-page" class="portal-container">
+    <div id="portal-screen" class="portal-container">
         <div class="sidebar">
             <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:15px; border-radius:12px;">
-                <img id="side-head" src="https://mc-heads.net/avatar/steve" style="width:40px; border-radius:5px;">
-                <span id="side-name" style="font-weight:bold;">---</span>
+                <img id="sidebar-head" src="https://mc-heads.net/avatar/steve" style="width:40px; border-radius:5px;">
+                <span id="sidebar-name" style="font-weight:bold;">---</span>
             </div>
             
-            <button class="side-btn" onclick="showPopup('CREDITS', 'Managed by: <b>Omar</b><br>Army Leader: <b>Raslan</b><br>Minister: <b>Hakim</b>')">CREDITS</button>
-            <button class="side-btn" onclick="showPopup('SERVER RULES', '1. Don\'t start a chat with a cornhub video or things about it.<br>2. Respect others.<br>3. Don\'t try to use hacks.<br>4. Have fun!')">SERVER RULES</button>
+            <button class="side-btn" onclick="openPopup('CREDITS', 'Owner: <b>Omar</b><br>Army Leader: <b>Raslan</b><br>Minister: <b>Hakim</b>')">CREDITS</button>
+            <button class="side-btn" onclick="openPopup('RULES', '1. Don\'t start a chat with a cornhub video.<br>2. Respect others.<br>3. Don\'t use hacks.<br>4. Have fun!')">SERVER RULES</button>
             <a href="https://mcsh.io" target="_blank" class="side-btn" style="border-color: #f59e0b; color: #f59e0b;">TRY SERVER HOST</a>
             <a href="https://discord.gg/pmwuB2fY" target="_blank" class="side-btn" style="background:#5865f2; border:none;">JOIN DISCORD</a>
 
-            <div style="background:rgba(16, 185, 129, 0.1); border:1px solid #10b981; padding:15px; border-radius:12px; text-align:center;">
-                <h3 id="game-res" style="margin:5px 0;">---</h3>
-                <button class="side-btn" style="padding:5px; font-size:0.7rem;" onclick="rollGame()">ROLL GAME</button>
+            <div style="background:rgba(16, 185, 129, 0.1); border:1px solid #10b981; padding:15px; border-radius:12px; text-align:center; margin-top:10px;">
+                <h3 id="roll-res" style="color:#10b981;">---</h3>
+                <button class="side-btn" style="padding:5px; font-size:0.7rem;" onclick="doRoll()">ROLL GAME</button>
             </div>
             <button class="side-btn" style="margin-top:auto; color:#ef4444; border-color:#ef4444;" onclick="location.reload()">LOGOUT</button>
         </div>
 
-        <div class="main-content" id="main-area">
+        <div class="main-content" id="main-ui">
             <h1 style="color:#10b981; font-size:3.5rem;">HYPERKINGDOM</h1>
-            <div class="ip-box" onclick="copyIP()">
+            <div class="ip-box" onclick="copyMyIP()">
                 <h2 style="color:#10b981; font-family:monospace;">hyperkingdom.mcsh.io</h2>
-                <p style="font-size:0.7rem; opacity:0.5;">[ CLICK TO COPY ]</p>
+                <p style="font-size:0.7rem; opacity:0.5;">[ CLICK TO COPY IP ]</p>
             </div>
         </div>
     </div>
 
+    <div id="info-popup" class="info-popup">
+        <h3 id="p-title" style="color:#3b82f6; margin-bottom:15px; border-bottom:1px solid #3b82f6; padding-bottom:5px;"></h3>
+        <p id="p-body" style="font-size:0.95rem; line-height:1.7;"></p>
+        <button class="side-btn" style="margin-top:20px;" onclick="closeMyPopup()">CLOSE</button>
+    </div>
+
     <script>
-        let correctMath;
-        const games = ["Survival", "OneBlock", "BedWars", "The Bridge", "Murder Mystery", "LifestealSMP"];
+        let secretAnswer;
+        const gamesList = ["Survival", "OneBlock", "BedWars", "The Bridge", "Lifesteal"];
 
-        function updateSkinPreview() {
-            const name = document.getElementById('username').value.trim();
-            if(name.length > 0) {
-                const url = `https://mc-heads.net/avatar/${name}`;
-                document.getElementById('login-head').src = url;
-                document.getElementById('side-head').src = url;
+        // 1. Math System
+        function newMath() {
+            const n1 = Math.floor(Math.random() * 7) + 2;
+            const n2 = Math.floor(Math.random() * 7) + 2;
+            secretAnswer = n1 + n2;
+            document.getElementById('math-prompt').innerText = `What is ${n1} + ${n2}?`;
+        }
+
+        // 2. Skin Change
+        function changeHead() {
+            const user = document.getElementById('player-name').value.trim();
+            if(user) {
+                const url = `https://mc-heads.net/avatar/${user}`;
+                document.getElementById('head-preview').src = url;
+                document.getElementById('sidebar-head').src = url;
             }
         }
 
-        function generateMath() {
-            const a = Math.floor(Math.random() * 8) + 2;
-            const b = Math.floor(Math.random() * 8) + 2;
-            correctMath = a + b;
-            document.getElementById('math-question').innerText = `Security: ${a} + ${b} = ?`;
-        }
-
-        function checkLogin() {
-            const user = document.getElementById('username').value.trim();
-            const ans = document.getElementById('math-answer').value;
-            if(user && parseInt(ans) === correctMath) {
-                document.getElementById('login-page').style.display = 'none';
-                document.getElementById('portal-page').style.display = 'flex';
-                document.getElementById('side-name').innerText = user;
+        // 3. Login Check
+        function validateAndEnter() {
+            const u = document.getElementById('player-name').value.trim();
+            const a = document.getElementById('math-user-answer').value;
+            if(u && parseInt(a) === secretAnswer) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('portal-screen').style.display = 'flex';
+                document.getElementById('sidebar-name').innerText = u;
             } else {
-                alert("Wrong Answer or Empty Name!");
-                generateMath();
-                document.getElementById('math-answer').value = "";
+                alert("Incorrect math or missing name!");
+                newMath();
+                document.getElementById('math-user-answer').value = "";
             }
         }
 
-        async function updateStatus() {
+        // 4. Server Check (New API)
+        async function refreshServer() {
             try {
-                const res = await fetch(`https://api.mcstatus.io/v2/status/java/hyperkingdom.mcsh.io?t=${Date.now()}`);
-                const data = await res.json();
+                const response = await fetch('https://api.mcsrvstat.us/2/hyperkingdom.mcsh.io');
+                const data = await response.json();
                 
                 const dot = document.getElementById('status-dot');
-                const count = document.getElementById('online-count');
-                const list = document.getElementById('list-content');
+                const count = document.getElementById('player-count');
+                const list = document.getElementById('list-container');
 
                 if(data.online) {
                     dot.className = 'dot online';
                     count.innerText = data.players.online;
                     
-                    // حل مشكلة الـ undefined: نتاكد ان الـ list موجودة وليست فارغة
                     if(data.players.list && data.players.list.length > 0) {
-                        list.innerHTML = data.players.list.map(p => {
-                            // فحص إضافي لكل لاعب عشان نمنع الـ undefined في الاسم
-                            const playerName = p.name ? p.name : "Unknown Player";
-                            return `
-                                <div class="player-row">
-                                    <img src="https://mc-heads.net/avatar/${playerName}">
-                                    <span>${playerName}</span>
-                                </div>
-                            `;
-                        }).join('');
+                        list.innerHTML = data.players.list.map(name => `
+                            <div class="player-row">
+                                <img src="https://mc-heads.net/avatar/${name}" onerror="this.src='https://mc-heads.net/avatar/steve'">
+                                <span>${name}</span>
+                            </div>
+                        `).join('');
                     } else {
-                        list.innerHTML = `<p style="padding:15px; font-size:0.75rem; text-align:center; color:#60a5fa;">${data.players.online} Player(s) Online</p>`;
+                        list.innerHTML = `<p style="padding:15px; text-align:center; font-size:0.8rem; opacity:0.6;">No public player list</p>`;
                     }
                 } else {
                     dot.className = 'dot';
                     count.innerText = "OFFLINE";
-                    list.innerHTML = `<p style="padding:15px; font-size:0.75rem; text-align:center; color:#ef4444;">Server Offline</p>`;
+                    list.innerHTML = `<p style="padding:15px; text-align:center; color:#ef4444;">Server Down</p>`;
                 }
-            } catch(e) {
-                console.log("Status Fetch Error");
-            }
+            } catch(e) { console.error("API Error"); }
         }
 
-        function showPopup(title, body) {
-            document.getElementById('popup-title').innerText = title;
-            document.getElementById('popup-body').innerHTML = body;
-            document.getElementById('popup-box').style.display = 'block';
-            document.getElementById('main-area').style.opacity = '0.2';
+        // UI Helpers
+        function togglePlayerList() {
+            const box = document.getElementById('player-list-box');
+            box.style.display = box.style.display === 'block' ? 'none' : 'block';
         }
 
-        function closePopup() {
-            document.getElementById('popup-box').style.display = 'none';
-            document.getElementById('main-area').style.opacity = '1';
+        function openPopup(title, body) {
+            document.getElementById('p-title').innerText = title;
+            document.getElementById('p-body').innerHTML = body;
+            document.getElementById('info-popup').style.display = 'block';
+            document.getElementById('main-ui').style.opacity = '0.1';
         }
 
-        function toggleList() {
-            const d = document.getElementById('player-
+        function closeMyPopup() {
+            document.getElementById('info-popup').style.display = 'none';
+            document.getElementById('main-ui').style.opacity = '1';
+        }
+
+        function doRoll() {
+            document.getElementById('roll-res').innerText = gamesList[Math.floor(Math.random()*gamesList.length)];
+        }
+
+        function copyMyIP() {
+            navigator.clipboard.writeText('hyperkingdom.mcsh.io');
+            alert('IP Copied!');
+        }
+
+        // Start
+        newMath();
+        refreshServer();
+        setInterval(refreshServer, 10000); // تحديث كل 10 ثواني عشان ميعملش بلوك
+    </script>
+</body>
+</html>
